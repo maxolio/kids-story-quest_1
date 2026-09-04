@@ -1,0 +1,26 @@
+﻿{
+  "name": "Развивающие сказки",
+  "short_name": "Сказки",
+  "description": "Интерактивные развивающие истории для малышей",
+  "start_url": "/kids-story-quest_1/",
+  "scope": "/kids-story-quest_1/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff8f0",
+  "theme_color": "#ff8c5a",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "assets/images/common/cat-walk.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/common/cat-walk.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
