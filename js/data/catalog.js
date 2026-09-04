@@ -14,7 +14,7 @@ export const SETS_DATA = [
         id: "cat-walk",
         title: "Большая прогулка Котёнка",
         subtitle: "Утро, завтрак, лужицы и добрый вечер",
-        icon: "🐱",
+        icon: "assets/images/common/cat-walk.png",
         stepsCount: 7,
         badge: "Хит для малышей"
       },

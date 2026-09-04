@@ -5,6 +5,12 @@ import { SETS_DATA } from './data/catalog.js';
 import { CAT_WALK_STORY } from './data/catWalkStory.js';
 import { soundManager } from './engine/sound.js';
 
+const BACK_ARROW_SVG = `
+  <svg class="btn-back-arrow" viewBox="0 0 24 24">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+`;
+
 class App {
   constructor() {
     this.appContainer = document.getElementById('app-container');
@@ -20,6 +26,7 @@ class App {
       selectedStoryId: null,
       currentStep: 1,
       backpackItem: null,
+      shoeChoice: null,
       collectedBadges: []
     };
 
@@ -94,9 +101,9 @@ class App {
   renderSetsScreen() {
     this.appContainer.innerHTML = `
       <header class="header-bar">
-        <div class="btn-icon" title="Сказки-тренажёры">🐱</div>
+        <div class="btn-icon" title="Развивающие сказки">⭐</div>
         <div class="header-title-container">
-          <div class="header-title">Приключения Котёнка</div>
+          <div class="header-title">Развивающие сказки</div>
         </div>
         ${this.renderHeaderControls(true)}
       </header>
@@ -154,7 +161,7 @@ class App {
   renderAboutScreen() {
     this.appContainer.innerHTML = `
       <header class="header-bar">
-        <button class="btn-icon" id="btnBackFromAbout" title="Назад">⬅️</button>
+        <button class="btn-icon" id="btnBackFromAbout" title="Назад">${BACK_ARROW_SVG}</button>
         <div class="header-title-container">
           <div class="header-title">О проекте</div>
         </div>
@@ -162,42 +169,28 @@ class App {
       </header>
 
       <main class="screen about-stage">
-        <div class="about-card-box">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-            <span style="font-size: 40px;">🐱</span>
-            <div>
-              <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--header-title-color);">«Приключения Котёнка»</h3>
-              <p style="font-size: 0.92rem; color: var(--text-muted);">Развивающие интерактивные сказки (2–4 года)</p>
-            </div>
+        <div class="about-card-box" style="text-align: center; gap: 16px;">
+          <div style="display: flex; justify-content: center; margin-bottom: 2px;">
+            <img src="assets/images/common/cat-walk.png" style="width: 86px; height: 86px; object-fit: cover; border-radius: 50%; border: 3.5px solid var(--header-border); box-shadow: 0 8px 20px rgba(0,0,0,0.08);" alt="Котёнок">
           </div>
 
-          <p style="font-size: 1rem; color: var(--text-main); line-height: 1.45;">
-            Добрый тренажёр социальных историй и полезных привычек, где малыш помогает пушистому герою принимать решения.
+          <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--header-title-color); margin-bottom: 2px;">
+            «Развивающие сказки»
+          </h3>
+
+          <p style="font-size: 1.05rem; color: var(--text-main); line-height: 1.5; margin: 0 auto; max-width: 440px;">
+            Надеемся, вам понравились наши сказочные истории для ваших малышей! 💖
           </p>
 
-          <div class="about-item">
-            <span class="about-item-icon">🌸</span>
-            <span><strong>Zero-Stress:</strong> без проигрышей, ошибок и таймеров</span>
-          </div>
-
-          <div class="about-item">
-            <span class="about-item-icon">🗣️</span>
-            <span><strong>Запуск речи:</strong> простые звукоподражания и ритмичные фразы</span>
-          </div>
-
-          <div class="about-item">
-            <span class="about-item-icon">☀️</span>
-            <span><strong>Привычки:</strong> мягкое освоение сна, гигиены и сборов</span>
-          </div>
-
-          <div class="about-item">
-            <span class="about-item-icon">💛</span>
-            <span><strong>Бережно:</strong> пастельные тона без резких вспышек</span>
+          <div style="background: var(--header-bg); border: 2px solid var(--header-border); border-radius: 18px; padding: 14px 20px; font-size: 1rem; color: var(--text-main); line-height: 1.55; margin-top: 6px;">
+            <div style="font-weight: 800; margin-bottom: 6px; color: var(--header-title-color);">Для вас работали:</div>
+            <div style="margin-bottom: 4px;">🎙️ <strong>Елена</strong> — озвучка</div>
+            <div>💻 <strong>Максим</strong> — разработчик</div>
           </div>
         </div>
 
         <button class="btn-start-story glowing-border" id="btnBackToHome" style="margin: 0 auto; width: 100%; max-width: 320px; justify-content: center;">
-          <span>⬅️</span>
+          ${BACK_ARROW_SVG}
           <span>На главный экран</span>
         </button>
       </main>
@@ -221,7 +214,7 @@ class App {
 
     this.appContainer.innerHTML = `
       <header class="header-bar">
-        <button class="btn-icon" id="btnBackToSets" title="Назад к сетам">⬅️</button>
+        <button class="btn-icon" id="btnBackToSets" title="Назад к сетам">${BACK_ARROW_SVG}</button>
         <div class="header-title-container">
           <div class="header-title">${currentSet.title}</div>
         </div>
@@ -236,9 +229,12 @@ class App {
         <div class="stories-grid">
           ${currentSet.stories.map(story => {
             const isPlayable = story.id === 'cat-walk';
+            const iconContent = story.icon && story.icon.includes('/')
+              ? `<img src="${story.icon}" class="card-icon-img" alt="${story.title}">`
+              : story.icon;
             return `
               <div class="story-card ${isPlayable ? '' : 'disabled'}" data-story-id="${story.id}">
-                <div class="story-card-icon">${story.icon}</div>
+                <div class="story-card-icon">${iconContent}</div>
                 <div style="flex: 1;">
                   <div class="card-title">${story.title}</div>
                   <div class="card-subtitle">${story.subtitle}</div>
@@ -278,7 +274,7 @@ class App {
   renderCoverScreen() {
     this.appContainer.innerHTML = `
       <header class="header-bar">
-        <button class="btn-icon" id="btnBackToStories" title="Назад к сказкам">⬅️</button>
+        <button class="btn-icon" id="btnBackToStories" title="Назад к сказкам">${BACK_ARROW_SVG}</button>
         <div class="header-title-container">
           <div class="header-title">Сказка готова!</div>
         </div>
@@ -286,7 +282,9 @@ class App {
       </header>
 
       <main class="screen story-cover-stage">
-        <div class="cover-avatar-box">🐱</div>
+        <div class="cover-avatar-box">
+          <img src="assets/images/common/cat-walk.png" class="cover-avatar-img" alt="Котёнок">
+        </div>
         <h2 class="cover-title">Большая прогулка Котёнка</h2>
         <p class="cover-desc">
           Уютная развивающая сказка-тренажёр на 7 шагов: утро, вкусный завтрак, ручеёк и тёплый дом.
@@ -309,6 +307,7 @@ class App {
       soundManager.playChime();
       this.state.currentStep = 1;
       this.state.backpackItem = null;
+      this.state.shoeChoice = null;
       this.state.collectedBadges = [];
       this.state.screen = 'QUEST';
       this.render();
@@ -321,19 +320,32 @@ class App {
   renderQuestScreen() {
     const scene = CAT_WALK_STORY.scenes.find(s => s.step === this.state.currentStep);
     
-    let beforeSvg = scene.beforeSvg;
+    let beforeContent = scene.beforeImage || scene.beforeSvg;
     let speechText = scene.speechText;
     let soundEffectText = scene.soundEffectText;
     let choices = scene.choices;
 
     if (scene.dynamicBranch) {
-      const branchKey = this.state.backpackItem || 'umbrella';
-      const branchData = scene.branches[branchKey];
-      beforeSvg = branchData.beforeSvg;
+      let branchKey = 'umbrella';
+      if (scene.branchBy === 'shoe') {
+        branchKey = this.state.shoeChoice || 'boots';
+      } else if (scene.branchBy === 'backpack_and_shoe') {
+        const bp = this.state.backpackItem || 'umbrella';
+        const sh = this.state.shoeChoice || 'boots';
+        branchKey = `${bp}_${sh}`;
+      } else {
+        branchKey = this.state.backpackItem || 'umbrella';
+      }
+      const branchData = scene.branches[branchKey] || Object.values(scene.branches)[0];
+      beforeContent = branchData.beforeImage || branchData.beforeSvg;
       speechText = branchData.speechText;
       soundEffectText = branchData.soundEffectText;
       choices = branchData.choices;
     }
+
+    const illustrationHtml = (beforeContent && beforeContent.includes('/') && !beforeContent.trim().startsWith('<'))
+      ? `<img src="${beforeContent}" class="scene-img" alt="Сцена">`
+      : (beforeContent || '');
 
     this.appContainer.innerHTML = `
       <header class="header-bar">
@@ -351,7 +363,7 @@ class App {
 
       <main class="screen quest-stage">
         <div class="scene-illustration" id="sceneIllustration">
-          ${beforeSvg}
+          ${illustrationHtml}
         </div>
 
         <div class="speech-bubble" id="speechBubble">
@@ -366,12 +378,17 @@ class App {
         </div>
 
         <div class="choices-row" id="choicesRow">
-          ${choices.map(choice => `
-            <button class="choice-btn glowing-border" data-choice-id="${choice.id}">
-              <div class="choice-icon">${choice.icon}</div>
-              <div class="choice-title">${choice.title}</div>
-            </button>
-          `).join('')}
+          ${choices.map(choice => {
+            const iconHtml = choice.icon && choice.icon.includes('/')
+              ? `<img src="${choice.icon}" class="choice-btn-img" alt="${choice.title}">`
+              : `<div class="choice-icon">${choice.icon}</div>`;
+            return `
+              <button class="choice-btn glowing-border" data-choice-id="${choice.id}">
+                ${iconHtml}
+                <div class="choice-title">${choice.title}</div>
+              </button>
+            `;
+          }).join('')}
         </div>
       </main>
     `;
@@ -400,7 +417,10 @@ class App {
     for (let i = 0; i < 5; i++) {
       const badge = this.state.collectedBadges[i];
       if (badge) {
-        slots.push(`<div class="choice-badge-slot filled">${badge}</div>`);
+        const badgeContent = badge.includes('/')
+          ? `<img src="${badge}" class="badge-slot-img" alt="значок">`
+          : badge;
+        slots.push(`<div class="choice-badge-slot filled">${badgeContent}</div>`);
       } else {
         slots.push(`<div class="choice-badge-slot"></div>`);
       }
@@ -426,12 +446,17 @@ class App {
           soundManager.playChime();
         }
 
-        if (chosen.badgeIcon) {
-          this.addBadge(chosen.badgeIcon);
+        const badgeVal = chosen.badgeIcon || chosen.badgeImage;
+        if (badgeVal) {
+          this.addBadge(badgeVal);
         }
 
         if (scene.isBackpackChoice) {
           this.state.backpackItem = choiceId;
+        }
+
+        if (scene.isShoeChoice) {
+          this.state.shoeChoice = choiceId;
         }
 
         const choicesRow = document.getElementById('choicesRow');
@@ -443,10 +468,15 @@ class App {
 
         // Замена картинки на «ПОСЛЕ»
         const illustration = document.getElementById('sceneIllustration');
-        if (illustration && chosen.afterSvg) {
+        const afterContent = chosen.afterSvg || chosen.afterImage;
+        if (illustration && afterContent) {
           illustration.classList.add('transitioning');
           setTimeout(() => {
-            illustration.innerHTML = chosen.afterSvg;
+            if (afterContent.includes('/') && !afterContent.trim().startsWith('<')) {
+              illustration.innerHTML = `<img src="${afterContent}" class="scene-img" alt="Сцена">`;
+            } else {
+              illustration.innerHTML = afterContent;
+            }
             illustration.classList.remove('transitioning');
           }, 200);
         }
@@ -496,32 +526,35 @@ class App {
       </header>
       
       <main class="screen" style="align-items: center; justify-content: center; text-align: center; gap: 20px;">
-        <div style="font-size: 84px; animation: popIn 0.6s ease;">😻</div>
+        <div class="final-avatar-box">
+          <img src="assets/images/common/cat-walk.png" class="final-avatar-img" alt="Котёнок">
+        </div>
         <h2 style="font-size: 1.7rem; font-weight: 900; color: var(--header-title-color);">Какая чудесная получилась прогулка!</h2>
         <div class="speech-bubble" style="max-width: 520px;">
           Ты помог Котёнку одеться, накормил, перевёл через ручеёк и спас от непогоды! 
           Котёнок мурлычет и передаёт тебе огромный пушистый привет: <strong>Мур-р-мяу!</strong>
         </div>
-        <button class="btn-start-story glowing-border" id="btnPlayAgain" style="margin-top: 10px;">
-          <span>🔄</span>
-          <span>Играть снова!</span>
+        <button class="btn-start-story glowing-border" id="btnGoHome" style="margin-top: 10px; width: 68px; height: 68px; border-radius: 50%; padding: 0; justify-content: center; font-size: 32px;" title="На главный экран">
+          <span>🏠</span>
         </button>
       </main>
     `;
 
-    document.getElementById('btnRestart').addEventListener('click', () => {
-      this.state.screen = 'STORIES';
-      this.render();
-    });
+    const finalSpeech = "Какая чудесная получилась прогулка! Ты помог Котёнку одеться, накормил, перевёл через ручеёк и спас от непогоды! Котёнок мурлычет: Мур-р-мяу!";
+    soundManager.speak(finalSpeech);
 
-    document.getElementById('btnPlayAgain').addEventListener('click', () => {
+    const goHome = () => {
       soundManager.playChime();
       this.state.currentStep = 1;
       this.state.backpackItem = null;
+      this.state.shoeChoice = null;
       this.state.collectedBadges = [];
-      this.state.screen = 'QUEST';
+      this.state.screen = 'SETS';
       this.render();
-    });
+    };
+
+    document.getElementById('btnRestart')?.addEventListener('click', goHome);
+    document.getElementById('btnGoHome')?.addEventListener('click', goHome);
 
     this.setupHeaderControls(false);
   }
